@@ -38,6 +38,11 @@ import * as loading from "./core/loading.js";
 // ------------------------------------------------------- module-scope scratch
 const _vel = new Vector3();
 
+// A wind-carved crest that opens onto a lower field toward the morning sun.
+// The slight offset from the world origin gives the first frame a composed
+// ridge-and-valley silhouette without changing the playable terrain.
+const CINEMATIC_START = new Vector3(140, 0, -88);
+
 async function boot() {
     const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("view"));
 
@@ -125,8 +130,8 @@ async function boot() {
     await loading.phase("welcoming the wanderer", 0.62);
 
     const character = new CharacterController(terrain);
-    character.position.set(0, 0, 0);
-    character.position.y = terrain.heightAt(0, 0);
+    character.position.copyFrom(CINEMATIC_START);
+    character.position.y = terrain.heightAt(CINEMATIC_START.x, CINEMATIC_START.z);
 
     // The figure: skeleton, garment simulation, shell fur.
     const figure = new Character(scene, terrain, sky, shadows, character);

@@ -12,6 +12,10 @@ const root = /** @type {HTMLElement} */ (document.getElementById("boot"));
 const hint = /** @type {HTMLElement} */ (document.getElementById("hint"));
 
 let progress = 0;
+// Keep the authored loading copy on screen long enough to be read, while never
+// holding a device that genuinely needs longer to finish initialising.
+const bootStartedAt = performance.now();
+const MIN_BOOT_VISIBLE_MS = 7000;
 
 /** Yield to the compositor so the loading screen repaints. */
 export function nextFrame() {
@@ -31,6 +35,10 @@ export async function phase(text, to) {
 
 export async function done() {
     await phase("raasta tayyar hai — the way is ready", 1);
+    const remaining = Math.max(0, MIN_BOOT_VISIBLE_MS - (performance.now() - bootStartedAt));
+    if (remaining > 0) {
+        await new Promise((r) => setTimeout(r, remaining));
+    }
     // Let the bar visibly land before the fade starts.
     await new Promise((r) => setTimeout(r, 360));
     root?.classList.add("gone");
