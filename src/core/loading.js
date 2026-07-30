@@ -11,11 +11,12 @@ const label = /** @type {HTMLElement} */ (document.getElementById("boot-phase"))
 const root = /** @type {HTMLElement} */ (document.getElementById("boot"));
 const hint = /** @type {HTMLElement} */ (document.getElementById("hint"));
 
-let progress = 0;
-// Keep the authored loading copy on screen long enough to be read, while never
-// holding a device that genuinely needs longer to finish initialising.
+// Eight authored loading messages share one deliberate seven-second sequence.
 const bootStartedAt = performance.now();
-const MIN_BOOT_VISIBLE_MS = 7000;
+const BOOT_DURATION_MS = 7000;
+const PHASE_COUNT = 8;
+const PHASE_DURATION_MS = BOOT_DURATION_MS / PHASE_COUNT;
+let phaseIndex = 0;
 
 /** Yield to the compositor so the loading screen repaints. */
 export function nextFrame() {
@@ -24,23 +25,26 @@ export function nextFrame() {
 
 /**
  * @param {string} text shown under the bar
- * @param {number} to target progress, 0..1
  */
-export async function phase(text, to) {
+export async function phase(text) {
+    const scheduledAt = bootStartedAt + phaseIndex * PHASE_DURATION_MS;
+    const remaining = Math.max(0, scheduledAt - performance.now());
+    if (remaining > 0) {
+        await new Promise((r) => setTimeout(r, remaining));
+    }
+
     if (label) label.textContent = text;
-    progress = Math.max(progress, to);
-    if (bar) bar.style.width = (progress * 100).toFixed(1) + "%";
+    phaseIndex = Math.min(PHASE_COUNT, phaseIndex + 1);
+    if (bar) bar.style.width = ((phaseIndex / PHASE_COUNT) * 100).toFixed(1) + "%";
     await nextFrame();
 }
 
 export async function done() {
-    await phase("raasta tayyar hai — the way is ready", 1);
-    const remaining = Math.max(0, MIN_BOOT_VISIBLE_MS - (performance.now() - bootStartedAt));
+    await phase("raasta tayyar hai — the way is ready");
+    const remaining = Math.max(0, BOOT_DURATION_MS - (performance.now() - bootStartedAt));
     if (remaining > 0) {
         await new Promise((r) => setTimeout(r, remaining));
     }
-    // Let the bar visibly land before the fade starts.
-    await new Promise((r) => setTimeout(r, 360));
     root?.classList.add("gone");
     hint?.classList.add("show");
     setTimeout(() => {

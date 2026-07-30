@@ -38,10 +38,8 @@ import * as loading from "./core/loading.js";
 // ------------------------------------------------------- module-scope scratch
 const _vel = new Vector3();
 
-// A wind-carved crest that opens onto a lower field toward the morning sun.
-// The slight offset from the world origin gives the first frame a composed
-// ridge-and-valley silhouette without changing the playable terrain.
-const CINEMATIC_START = new Vector3(140, 0, -88);
+// Keep the original start, shifted two metres left on the world X axis.
+const START_POSITION = new Vector3(-2, 0, 0);
 
 async function boot() {
     const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("view"));
@@ -51,7 +49,7 @@ async function boot() {
         return;
     }
 
-    await loading.phase("awakening the mountain light", 0.05);
+    await loading.phase("awakening the mountain light");
 
     const engine = new WebGPUEngine(canvas, {
         antialias: false, // TAA handles edges; MSAA here would just cost bandwidth
@@ -88,7 +86,7 @@ async function boot() {
     engine.captureGPUFrameTime(true);
     registerShaders();
 
-    await loading.phase("laying the first snowfield", 0.12);
+    await loading.phase("laying the first snowfield");
 
     const scene = new Scene(engine);
     scene.clearColor = new Color4(0.02, 0.03, 0.05, 1);
@@ -105,7 +103,7 @@ async function boot() {
     scene.activeCamera = rig.camera;
 
     // ------------------------------------------------------------------ sky
-    await loading.phase("calling morning into the valley", 0.2);
+    await loading.phase("calling morning into the valley");
     const sky = new Sky(scene);
     sky.mesh.renderingGroupId = 0;
     await sky.solve();
@@ -120,18 +118,18 @@ async function boot() {
     const depthPass = new DepthPass(scene);
 
     // -------------------------------------------------------------- terrain
-    await loading.phase("reading the Himalayan contours", 0.34);
+    await loading.phase("reading the Himalayan contours");
     const terrain = new Terrain(scene, sky, shadows);
     terrain.mesh.renderingGroupId = 1;
     await terrain.build();
     onChange("showTerrain", (v) => (terrain.mesh.isVisible = v));
     depthPass.registerCaster(terrain.mesh, terrain.makePrepassMaterial());
 
-    await loading.phase("welcoming the wanderer", 0.62);
+    await loading.phase("welcoming the wanderer");
 
     const character = new CharacterController(terrain);
-    character.position.copyFrom(CINEMATIC_START);
-    character.position.y = terrain.heightAt(CINEMATIC_START.x, CINEMATIC_START.z);
+    character.position.copyFrom(START_POSITION);
+    character.position.y = terrain.heightAt(START_POSITION.x, START_POSITION.z);
 
     // The figure: skeleton, garment simulation, shell fur.
     const figure = new Character(scene, terrain, sky, shadows, character);
@@ -172,7 +170,7 @@ async function boot() {
 
     // ------------------------------------------------------------- warm-up
     // Everything that can compile, compiles here — behind the loading screen.
-    await loading.phase("weaving the winter spell", 0.78);
+    await loading.phase("weaving the winter spell");
     shadows.update(rig.camera, sky.sunDir);
     sky.render(rig, 0);
     await terrain.warmUp();
@@ -194,7 +192,7 @@ async function boot() {
         await whenReady(passes[i], "post:" + passes[i].name);
     }
 
-    await loading.phase("warming the high-altitude light", 0.92);
+    await loading.phase("warming the high-altitude light");
     // A few real frames so every render target is allocated and every pipeline
     // has actually been bound at least once.
     for (let i = 0; i < 3; i++) {

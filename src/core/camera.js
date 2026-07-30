@@ -48,14 +48,11 @@ export class CameraRig {
         this.camera = cam;
         this.scene = scene;
 
-        // Open on the sun-facing side of the ridge: it keeps the character in
-        // the foreground while the descending valley and warm horizon remain
-        // in frame before the player takes control.
-        this.yaw = 1.70;
-        this.pitch = 0.11;
+        this.yaw = 2.4;
+        this.pitch = 0.17;
 
-        this.distance = 7.4;
-        this.distanceTarget = 7.4;
+        this.distance = 6.2;
+        this.distanceTarget = 6.2;
 
         /** Smoothed pivot position (the thing the spring chases). */
         this.pivot = new Vector3(0, 0, 0);
