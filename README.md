@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/himlands-hero.svg" alt="Himlands — a cinematic snow valley" width="100%" />
+  <img src="./assets/himlands-live.png" alt="Himlands — live gameplay capture" width="100%" />
 </p>
 
 <p align="center">
@@ -37,5 +37,3 @@
 </p>
 
 ---
-
-<p align="center"><sub>Built with care by Satyajit Beura.</sub></p>
