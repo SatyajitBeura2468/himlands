@@ -2,7 +2,7 @@
 
 Himlands began from the Snowflow real-time procedural snow rendering demonstration.
 
-- Maksymilian Dendura, Satyajit Beura, Vaibhav Mishra, Krishna Sharma, Aditya Soni
+- ©2026 Maksymilian Dendura, Satyajit Beura, Vaibhav Mishra, Krishna Sharma, Aditya Soni
 - Imported commit: 545039733b74eec742862f161990142c7ca7c7ec
 - Original license: MIT
 
