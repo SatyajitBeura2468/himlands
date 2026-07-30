@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640" role="img" aria-labelledby="title description">
+  <title id="title">Himlands — a quiet procedural snow world</title>
+  <desc id="description">A cinematic snow valley beneath a pale winter sun.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.82" y2="1">
+      <stop offset="0" stop-color="#15283a"/>
+      <stop offset="0.42" stop-color="#5c7890"/>
+      <stop offset="0.75" stop-color="#d6d8cf"/>
+      <stop offset="1" stop-color="#f6f3eb"/>
+    </linearGradient>
+    <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#eef2ee"/>
+      <stop offset="1" stop-color="#94a7b1"/>
+    </linearGradient>
+    <linearGradient id="ridge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#c5d1d5"/>
+      <stop offset="1" stop-color="#5c7583"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop stop-color="#fffdf2" stop-opacity="0.98"/>
+      <stop offset="0.22" stop-color="#fff7d5" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#fff6cf" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+  <rect width="1600" height="640" fill="url(#sky)"/>
+  <circle cx="380" cy="160" r="170" fill="url(#sun)"/>
+  <path d="M0 337 136 289l116 40 153-116 113 94 142-56 94 92 115-142 125 159 129-91 131 79 126-40 140 80v205H0Z" fill="#506d7d" opacity="0.53" filter="url(#soft)"/>
+  <path d="M0 392 135 288l117 43 153-115 112 96 143-61 94 97 115-144 125 160 129-94 132 82 124-43 141 79v192H0Z" fill="url(#ridge)"/>
+  <path d="m0 436 143-82 129 26 137-53 140 75 139-22 113 54 112-58 115 38 124-56 116 51 122-18 123 49v201H0Z" fill="url(#snow)"/>
+  <path d="M0 500c165-70 289-17 401-46 133-35 171-119 326-70 121 38 174 136 311 106 143-31 173-134 304-96 87 25 174 111 258 86v160H0Z" fill="#e9eeea"/>
+  <path d="M0 579c160-55 311-63 463-24 136 35 249 85 382 37 157-57 241-165 407-114 136 41 231 133 348 105v57H0Z" fill="#bdcbd0"/>
+  <path d="M214 640c96-135 211-183 334-154 103 24 128 124 235 120 126-5 163-162 274-203 86-31 182-12 314 67l-97 170Z" fill="#87a0aa" opacity="0.5"/>
+  <path d="M632 640c98-128 177-187 238-177 89 15 97 132 161 147 74 18 151-89 255-158" fill="none" stroke="#f7fbf7" stroke-width="8" opacity="0.5"/>
+  <path d="M750 640c89-89 172-142 248-159 82-18 143 5 224 76" fill="none" stroke="#607a86" stroke-width="3" opacity="0.52"/>
+  <g fill="#f7f7f1" opacity="0.82">
+    <circle cx="109" cy="100" r="2"/><circle cx="245" cy="204" r="1.5"/><circle cx="551" cy="119" r="2"/><circle cx="707" cy="228" r="1"/><circle cx="1197" cy="96" r="2"/><circle cx="1387" cy="229" r="1.5"/><circle cx="1490" cy="139" r="2"/>
+  </g>
+  <g transform="translate(96 76)" fill="#f9fbf9">
+    <text x="0" y="0" font-family="Georgia, 'Times New Roman', serif" font-size="21" letter-spacing="8" opacity="0.76">HIMLANDS</text>
+    <text x="0" y="67" font-family="Georgia, 'Times New Roman', serif" font-size="58" letter-spacing="1">Where the snow remembers.</text>
+  </g>
+  <path d="M96 178h196" stroke="#fbfaf1" stroke-width="2" opacity="0.7"/>
+</svg>
