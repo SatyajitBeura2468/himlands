@@ -64,8 +64,10 @@ export class SpellSystem {
      * @param {import("../character/figure.js").Figure|null} figure
      * @param {import("../core/camera.js").CameraRig} rig
      * @param {import("../vfx/particles.js").SprayField} spray
+     * @param {import("../core/audio.js").Soundscape} [audio]
      */
-    constructor(scene, sky, shadows, terrain, controller, figure, rig, spray) {
+    constructor(scene, sky, shadows, terrain, controller, figure, rig, spray, audio) {
+        this.audio = audio || null;
         this.lights = new SpellLights();
         this.water = new WaterBody(scene, sky, shadows, this.lights);
         this.crystals = new CrystalField(scene, sky, shadows, this.lights);
@@ -225,6 +227,7 @@ export class SpellSystem {
             // at the sky must not launch it into the air.
             const fl = Math.hypot(this.aim.x, this.aim.z) || 1;
             this.sweep.trigger(this.aim.x / fl, this.aim.z / fl);
+            this.audio?.spell(1);
             rig.addTrauma(0.12);
             return;
         }
@@ -250,11 +253,13 @@ export class SpellSystem {
             );
             if (key === 3) this.bloom.trigger(_aim[0], _aim[1], _aim[2]);
             else this.crystallize.trigger(_aim[0], _aim[1], _aim[2]);
+            this.audio?.spell(key);
             return;
         }
 
         if (key === 5) {
             this.vortex.trigger();
+            this.audio?.spell(5);
             rig.addTrauma(0.10);
         }
     }
@@ -264,15 +269,18 @@ export class SpellSystem {
         if (held) {
             if (!this.ribbon.held) {
                 this.ribbon.trigger();
+                this.audio?.setRibbon(true);
                 this._lastCast = this._time;
             }
         } else if (this.ribbon.held) {
             this.ribbon.release();
+            this.audio?.setRibbon(false);
         }
     }
 
     _cancelAll() {
         for (let i = 0; i < this.spells.length; i++) this.spells[i].cancel();
+        this.audio?.setRibbon(false);
     }
 
     /** Live spell count, for the overlay. */

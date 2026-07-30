@@ -19,6 +19,7 @@ import {
     sample, checkSpike, stats, mark, installDrawCounter, endFrameDraws,
 } from "./core/perf.js";
 import { initInput, pollInput, endFrame, input } from "./core/input.js";
+import { Soundscape } from "./core/audio.js";
 import { CameraRig } from "./core/camera.js";
 import { CharacterController } from "./character/controller.js";
 import { Character } from "./character/character.js";
@@ -43,6 +44,7 @@ const START_POSITION = new Vector3(-2, 0, 0);
 
 async function boot() {
     const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("view"));
+    const audio = new Soundscape(canvas);
 
     if (!navigator.gpu) {
         loading.fail("WebGPU is not available in this browser.");
@@ -151,7 +153,7 @@ async function boot() {
     // one of them writes into the same terrain state buffer the feet and the
     // wake do, and lights the snow through the same four-slot pool.
     const spells = new SpellSystem(
-        scene, sky, shadows, terrain, character, figure.figure, rig, spray
+        scene, sky, shadows, terrain, character, figure.figure, rig, spray, audio
     );
     // Every surface a spell can light.
     spells.addConsumers(
@@ -228,6 +230,7 @@ async function boot() {
         // at the boot's actual planted position, which only exists once the
         // figure has been solved.
         figure.update(dt);
+        audio.update(dt, character, figure.figure);
         contact.update(dt);
         const tChar = performance.now();
 
@@ -289,7 +292,7 @@ async function boot() {
     setTimeout(() => overlay.resetSpikes(), 800);
 
     globalThis.SNOWFLOW = {
-        engine, scene, rig, character, figure, contact, spray, wake, spells,
+        engine, scene, rig, character, figure, contact, spray, wake, spells, audio,
         overlay, terrain, sky, shadows, post, depthPass,
         S, input, perfStats: stats,
     };

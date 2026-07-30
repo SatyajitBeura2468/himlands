@@ -81,6 +81,10 @@ export const S = {
      */
     waterDepthTint: 1.0,
 
+    // ----------------------------------------------------------------- audio
+    /** Master gain for the event-led snow and spell soundscape. */
+    sfxVolume: 0.78,
+
     // ------------------------------------------------------------------ post
     taa: true,
     ssr: true,
@@ -178,6 +182,12 @@ export const SCHEMA = [
             { k: "spellLight", l: "Spell light", t: "f", min: 0, max: 3, step: 0.01 },
             { k: "spellSpray", l: "Spell spray", t: "f", min: 0, max: 2.5, step: 0.01 },
             { k: "waterDepthTint", l: "Water depth", t: "f", min: 0, max: 3, step: 0.01 },
+        ],
+    },
+    {
+        group: "Audio",
+        items: [
+            { k: "sfxVolume", l: "SFX volume", t: "f", min: 0, max: 1, step: 0.01 },
         ],
     },
     {
