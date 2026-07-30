@@ -230,7 +230,6 @@ async function boot() {
         // at the boot's actual planted position, which only exists once the
         // figure has been solved.
         figure.update(dt);
-        audio.update(dt, character, figure.figure);
         contact.update(dt);
         const tChar = performance.now();
 
@@ -249,6 +248,7 @@ async function boot() {
         // cascade matrices; before the terrain, so the brushes every spell
         // writes are in the staging array when the simulation pass runs.
         spells.update(dt, rig.camera.position);
+        audio.update(dt, character, figure.figure);
         const tSpells = performance.now();
         terrain.update(rig.camera.position, character.position, dt);
         const tTerrain = performance.now();

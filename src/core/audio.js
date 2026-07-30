@@ -16,6 +16,7 @@ const ASSET = {
     sweepSpray: new URL("../assets/audio/sweep-snow-spray.ogg", import.meta.url).href,
     bloomSplash: new URL("../assets/audio/bloom-splash.ogg", import.meta.url).href,
     bloomImpact: new URL("../assets/audio/bloom-impact.ogg", import.meta.url).href,
+    bloomFallout: new URL("../assets/audio/bloom-fallout-rain.ogg", import.meta.url).href,
     ribbonBubble: new URL("../assets/audio/ribbon-bubble.ogg", import.meta.url).href,
     crystallizeIce: new URL("../assets/audio/crystallize-ice.wav", import.meta.url).href,
     crystallizeColdsnap: new URL("../assets/audio/crystallize-coldsnap.wav", import.meta.url).href,
@@ -47,8 +48,11 @@ export class Soundscape {
         this.unlocked = false;
         this.context = null;
         this.ribbonHeld = false;
+        this.bloomFallout = 0;
+        this.vortexStrength = 0;
         this.elapsed = 0;
         this.nextRibbonBubble = 0;
+        this.nextVortexGust = 0;
 
         this.footsteps = [makePool(ASSET.footstepA, 3), makePool(ASSET.footstepB, 3)];
         this.sweep = makePool(ASSET.sweepWater, 3);
@@ -61,6 +65,8 @@ export class Soundscape {
         this.vortex = makePool(ASSET.surfWind, 2);
         this.surfLoop = makeLoop(ASSET.surfWind);
         this.ribbonLoop = makeLoop(ASSET.ribbonWater);
+        this.bloomFalloutLoop = makeLoop(ASSET.bloomFallout);
+        this.vortexLoop = makeLoop(ASSET.surfWind);
 
         const unlock = () => this.unlock();
         canvas.addEventListener("pointerdown", unlock, { once: true });
@@ -89,13 +95,23 @@ export class Soundscape {
 
         const surfStrength = character.surf * (0.28 + character.speed01 * 0.72);
         this._loop(this.surfLoop, surfStrength * 0.32, 0.82 + character.speed01 * 0.34, dt);
-        this._loop(this.ribbonLoop, this.ribbonHeld ? 0.20 : 0, 0.92, dt);
+        this._loop(this.ribbonLoop, this.ribbonHeld ? 0.27 : 0, 0.92, dt);
+        this._loop(this.bloomFalloutLoop, this.bloomFallout * 0.19, 0.84, dt);
+        this._loop(this.vortexLoop, this.vortexStrength * 0.31, 0.72 + this.vortexStrength * 0.30, dt);
 
         // A held ribbon has small, irregular water particles on top of its
         // continuous body, which keeps it from sounding like a static loop.
         if (this.ribbonHeld && this.elapsed >= this.nextRibbonBubble) {
-            this._play(this.ribbonBubbles, 0.10 + Math.random() * 0.04, 0.88 + Math.random() * 0.22);
-            this.nextRibbonBubble = this.elapsed + 0.48 + Math.random() * 0.58;
+            this._play(this.ribbonBubbles, 0.14 + Math.random() * 0.06, 0.88 + Math.random() * 0.22);
+            this.nextRibbonBubble = this.elapsed + 0.32 + Math.random() * 0.42;
+        }
+
+        // A real vortex builds, sustains, and sheds material rather than ending
+        // with a single gust. These tiny grit accents follow that live envelope.
+        if (this.vortexStrength > 0.58 && this.elapsed >= this.nextVortexGust) {
+            this._play(this.sweepSpray, 0.10 + this.vortexStrength * 0.06, 0.74 + Math.random() * 0.16);
+            this._noise(0.16, 0.016 + this.vortexStrength * 0.012, 1650, 1.9);
+            this.nextVortexGust = this.elapsed + 0.42 + Math.random() * 0.28;
         }
     }
 
@@ -108,20 +124,23 @@ export class Soundscape {
             this._play(this.sweepSpray, 0.23, 0.93 + Math.random() * 0.14, 0.035);
             this._noise(0.26, 0.035, 1100, 1.4);
         } else if (key === 3) {
-            // Bloom: a water eruption gets a second delayed surface collapse.
-            this._play(this.bloom, 0.54, 0.86 + Math.random() * 0.10);
-            this._play(this.bloomImpact, 0.28, 0.82 + Math.random() * 0.10, 0.075);
-            this._noise(0.46, 0.05, 560, 0.9);
+            // Bloom reaches the ground at 100 ms, so its heavy eruption follows
+            // the visual crater and then leaves a falling-water/snow tail.
+            this._noise(0.72, 0.07, 300, 0.75);
+            this._play(this.bloom, 0.68, 0.86 + Math.random() * 0.10, 0.10);
+            this._play(this.bloomImpact, 0.42, 0.82 + Math.random() * 0.10, 0.145);
+            this._play(this.sweepSpray, 0.24, 1.00 + Math.random() * 0.12, 0.12);
         } else if (key === 4) {
             // Crystallize: the main ice split is followed by a colder fracture.
             this._play(this.ice, 0.46, 0.92 + Math.random() * 0.12);
             this._play(this.coldSnap, 0.20, 1.05 + Math.random() * 0.08, 0.055);
             this._noise(0.34, 0.026, 3100, 2.6);
         } else if (key === 5) {
-            // Vortex: a fast wind surge carries a layer of airborne snow grit.
-            this._play(this.vortex, 0.26, 1.16);
-            this._play(this.sweepSpray, 0.15, 0.72 + Math.random() * 0.10, 0.04);
-            this._noise(0.64, 0.04, 780, 1.1);
+            // Vortex begins with the snow lifting from the ground; the live loop
+            // in update() then follows its spin-up, hold, and settling phase.
+            this._play(this.vortex, 0.42, 0.92 + Math.random() * 0.08);
+            this._play(this.sweepSpray, 0.23, 0.82 + Math.random() * 0.12, 0.045);
+            this._noise(0.80, 0.062, 720, 0.95);
         }
     }
 
@@ -129,6 +148,34 @@ export class Soundscape {
     setRibbon(held) {
         this.ribbonHeld = held;
         if (held) this.nextRibbonBubble = this.elapsed + 0.15;
+    }
+
+    ribbonStart() {
+        if (!this.unlocked) return;
+        this._play(this.ribbonBubbles, 0.22, 0.92 + Math.random() * 0.10);
+        this._noise(0.22, 0.02, 1300, 1.5);
+    }
+
+    ribbonRelease() {
+        if (!this.unlocked) return;
+        // Releasing 2 throws the recorded water body forward: it gets a clear
+        // launch rush and a loose-snow shear, rather than simply stopping.
+        this._play(this.sweep, 0.34, 1.04 + Math.random() * 0.10);
+        this._play(this.sweepSpray, 0.20, 0.94 + Math.random() * 0.12, 0.055);
+        this._noise(0.38, 0.04, 920, 1.0);
+    }
+
+    /** @param {number} intensity */
+    setBloomFallout(intensity) {
+        this.bloomFallout = Math.max(0, Math.min(1, intensity));
+    }
+
+    /** @param {number} intensity */
+    setVortex(intensity) {
+        this.vortexStrength = Math.max(0, Math.min(1, intensity));
+        if (this.vortexStrength > 0.58 && this.nextVortexGust < this.elapsed) {
+            this.nextVortexGust = this.elapsed + 0.16;
+        }
     }
 
     _play(pool, gain, rate, delay = 0) {
@@ -176,7 +223,7 @@ export class Soundscape {
     }
 
     dispose() {
-        for (const voice of [this.surfLoop, this.ribbonLoop]) {
+        for (const voice of [this.surfLoop, this.ribbonLoop, this.bloomFalloutLoop, this.vortexLoop]) {
             voice.pause();
             voice.src = "";
         }

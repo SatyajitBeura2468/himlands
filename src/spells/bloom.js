@@ -56,6 +56,8 @@ export class Bloom {
         this._leanZ = 0;
         this._burst = false;
         this._curtainOwed = 0;
+        /** 0..1 envelope for the eruption's falling water and powder. */
+        this.soundIntensity = 0;
     }
 
     /** @param {number} x @param {number} y @param {number} z ground target */
@@ -67,6 +69,7 @@ export class Bloom {
         this.t = 0;
         this._burst = false;
         this._curtainOwed = 0;
+        this.soundIntensity = 0;
         // A different lean each cast, so two Blooms in the same place are not
         // the same object twice.
         const a = Math.random() * Math.PI * 2;
@@ -80,6 +83,16 @@ export class Bloom {
         if (!this.active) return;
         const ctx = this.ctx;
         this.t += dt;
+
+        // The impact is a short event, but the curtain is visible and audible
+        // for most of the spell. This is intentionally tied to its own timeline
+        // instead of to input state, because Bloom is already independent once
+        // it has been placed.
+        const falloutT = this.t - 0.12;
+        this.soundIntensity = falloutT <= 0
+            ? 0
+            : smooth01(falloutT / 0.18)
+                * (1 - smooth01((falloutT - 0.60) / (LIFE + FALLOUT - 0.60)));
 
         if (this.t >= LIFE + FALLOUT) {
             this._end();
@@ -300,6 +313,7 @@ export class Bloom {
 
     _end() {
         this.active = false;
+        this.soundIntensity = 0;
         if (this.strand >= 0) {
             this.ctx.water.release(this.strand);
             this.strand = -1;

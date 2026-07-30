@@ -173,6 +173,12 @@ export class SpellSystem {
 
         for (let i = 0; i < this.spells.length; i++) this.spells[i].update(dt);
 
+        // These two spells persist well beyond the button press. Feed their
+        // visual envelopes into the soundscape so an eruption can fall out and
+        // a snow column can spin up, hold, then settle in the same time window.
+        this.audio?.setBloomFallout(this.bloom.soundIntensity);
+        this.audio?.setVortex(this.vortex.soundIntensity);
+
         // The casting stance eases in while anything is up and out again after.
         // Nothing about it is a switch.
         const casting =
@@ -270,10 +276,12 @@ export class SpellSystem {
             if (!this.ribbon.held) {
                 this.ribbon.trigger();
                 this.audio?.setRibbon(true);
+                this.audio?.ribbonStart();
                 this._lastCast = this._time;
             }
         } else if (this.ribbon.held) {
             this.ribbon.release();
+            this.audio?.ribbonRelease();
             this.audio?.setRibbon(false);
         }
     }

@@ -59,6 +59,8 @@ export class Vortex {
         this._grainOwed = 0;
         /** How far out the stripping ring has reached, metres. */
         this.ring = 0.9;
+        /** 0..1 spin envelope shared with the vortex sound bed. */
+        this.soundIntensity = 0;
     }
 
     trigger() {
@@ -70,6 +72,7 @@ export class Vortex {
         this.ring = 0.9;
         this._stripOwed = 0;
         this._grainOwed = 0;
+        this.soundIntensity = 0;
         this.active = true;
     }
 
@@ -91,6 +94,7 @@ export class Vortex {
         this.z = ctx.controller.position.z;
 
         const env = smooth01(this.t / RAMP) * (1 - smooth01((this.t - RAMP - HOLD) / FADE));
+        this.soundIntensity = env;
         // Spins up and keeps spinning: the rotation does not ease out with the
         // envelope, so the last frame is a fading column that is still turning
         // rather than one that is winding down.
@@ -297,6 +301,7 @@ export class Vortex {
 
     _end() {
         this.active = false;
+        this.soundIntensity = 0;
         for (let i = 0; i < HELICES; i++) {
             if (this.strands[i] >= 0) {
                 this.ctx.water.release(this.strands[i]);
