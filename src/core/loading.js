@@ -30,7 +30,7 @@ export async function phase(text, to) {
 }
 
 export async function done() {
-    await phase("ready", 1);
+    await phase("raasta tayyar hai — the way is ready", 1);
     // Let the bar visibly land before the fade starts.
     await new Promise((r) => setTimeout(r, 360));
     root?.classList.add("gone");

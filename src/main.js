@@ -46,7 +46,7 @@ async function boot() {
         return;
     }
 
-    await loading.phase("creating device", 0.05);
+    await loading.phase("awakening the mountain light", 0.05);
 
     const engine = new WebGPUEngine(canvas, {
         antialias: false, // TAA handles edges; MSAA here would just cost bandwidth
@@ -83,7 +83,7 @@ async function boot() {
     engine.captureGPUFrameTime(true);
     registerShaders();
 
-    await loading.phase("building scene", 0.12);
+    await loading.phase("laying the first snowfield", 0.12);
 
     const scene = new Scene(engine);
     scene.clearColor = new Color4(0.02, 0.03, 0.05, 1);
@@ -100,7 +100,7 @@ async function boot() {
     scene.activeCamera = rig.camera;
 
     // ------------------------------------------------------------------ sky
-    await loading.phase("integrating atmosphere", 0.2);
+    await loading.phase("calling morning into the valley", 0.2);
     const sky = new Sky(scene);
     sky.mesh.renderingGroupId = 0;
     await sky.solve();
@@ -115,14 +115,14 @@ async function boot() {
     const depthPass = new DepthPass(scene);
 
     // -------------------------------------------------------------- terrain
-    await loading.phase("baking heightfield", 0.34);
+    await loading.phase("reading the Himalayan contours", 0.34);
     const terrain = new Terrain(scene, sky, shadows);
     terrain.mesh.renderingGroupId = 1;
     await terrain.build();
     onChange("showTerrain", (v) => (terrain.mesh.isVisible = v));
     depthPass.registerCaster(terrain.mesh, terrain.makePrepassMaterial());
 
-    await loading.phase("placing character", 0.62);
+    await loading.phase("welcoming the wanderer", 0.62);
 
     const character = new CharacterController(terrain);
     character.position.set(0, 0, 0);
@@ -167,7 +167,7 @@ async function boot() {
 
     // ------------------------------------------------------------- warm-up
     // Everything that can compile, compiles here — behind the loading screen.
-    await loading.phase("compiling pipelines", 0.78);
+    await loading.phase("weaving the winter spell", 0.78);
     shadows.update(rig.camera, sky.sunDir);
     sky.render(rig, 0);
     await terrain.warmUp();
@@ -189,7 +189,7 @@ async function boot() {
         await whenReady(passes[i], "post:" + passes[i].name);
     }
 
-    await loading.phase("warming render targets", 0.92);
+    await loading.phase("warming the high-altitude light", 0.92);
     // A few real frames so every render target is allocated and every pipeline
     // has actually been bound at least once.
     for (let i = 0; i < 3; i++) {
