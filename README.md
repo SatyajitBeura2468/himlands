@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/himlands-live.png" alt="Himlands — live gameplay capture" width="100%" />
+  <img src="./assets/himlands-spellscape.png" alt="Himlands — spellcasting in the snowfield" width="100%" />
 </p>
 
 <p align="center">
