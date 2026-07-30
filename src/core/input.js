@@ -2,7 +2,8 @@
  * Raw input state. Everything lands in one mutable struct that systems poll —
  * no events fired into game code, no per-frame allocation.
  *
- * Mouse look uses pointer lock, which frees the right button for snow-surf.
+ * Mouse look uses pointer lock. Snow-surf is deliberately a held action rather
+ * than a touchpad gesture: hold Space or the primary mouse button.
  */
 
 export const input = {
@@ -18,7 +19,7 @@ export const input = {
     // Zoom, consumed by the camera rig.
     zoomDelta: 0,
 
-    surf: false, // RMB held
+    surf: false, // Space or primary mouse button held
     sprint: false, // shift
 
     /** @type {number} 0 = none, else 1..5 — set on keydown, cleared each frame */
@@ -30,6 +31,7 @@ export const input = {
 };
 
 const keys = Object.create(null);
+let primaryPointerHeld = false;
 
 const LOOK_SCALE = 0.0022;
 
@@ -52,6 +54,7 @@ export function initInput(canvas, hooks) {
         if (!input.locked) {
             // Drop held state so the character doesn't run off while unfocused.
             for (const k in keys) keys[k] = false;
+            primaryPointerHeld = false;
             input.surf = false;
             input.spellHeld2 = false;
         }
@@ -67,11 +70,11 @@ export function initInput(canvas, hooks) {
 
     document.addEventListener("mousedown", (e) => {
         if (!input.locked) return;
-        if (e.button === 2) input.surf = true;
+        if (e.button === 0) primaryPointerHeld = true;
     });
 
     document.addEventListener("mouseup", (e) => {
-        if (e.button === 2) input.surf = false;
+        if (e.button === 0) primaryPointerHeld = false;
     });
 
     document.addEventListener(
@@ -93,6 +96,7 @@ export function initInput(canvas, hooks) {
         }
         if (e.repeat) return;
         keys[e.code] = true;
+        if (e.code === "Space") e.preventDefault();
 
         const n = SPELL_KEYS[e.code];
         if (n) {
@@ -103,11 +107,13 @@ export function initInput(canvas, hooks) {
 
     window.addEventListener("keyup", (e) => {
         keys[e.code] = false;
+        if (e.code === "Space") e.preventDefault();
         if (SPELL_KEYS[e.code] === 2) input.spellHeld2 = false;
     });
 
     window.addEventListener("blur", () => {
         for (const k in keys) keys[k] = false;
+        primaryPointerHeld = false;
         input.surf = false;
         input.spellHeld2 = false;
     });
@@ -140,6 +146,7 @@ export function pollInput() {
     input.moveZ = z;
     input.moving = len > 0.001;
     input.sprint = !!(keys.ShiftLeft || keys.ShiftRight);
+    input.surf = !!(keys.Space || primaryPointerHeld);
 }
 
 /** Clear per-frame accumulators. Called at the very end of the frame. */
